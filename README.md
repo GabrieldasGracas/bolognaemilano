@@ -23,8 +23,8 @@ java -cp bin bolonhaemilano.Main
 ## Etapas
 
 1. Estrutura inicial, Main e menu (concluida)
-2. Classes Jogador e Cidade
-3. Economia: florins, terras e graos
+2. Classes Jogador e Cidade (concluida) 
+3. Economia: florins, terras e graos (concluida)
 4. Agricultura e populacao
 5. Impostos e governo
 6. Construcoes e soldados

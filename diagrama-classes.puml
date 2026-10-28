@@ -1,5 +1,5 @@
 @startuml
-title Bolonha e Milano - Diagrama de classes (Etapa 2)
+title Bolonha e Milano - Diagrama de classes (Etapa 3)
 
 class Main {
   + main(args: String[]): void
@@ -10,12 +10,20 @@ class Menu {
   - emExecucao: boolean
   - jogador: Jogador
   - cidade: Cidade
+  - mercado: Mercado
   + executar(): void
-  - iniciarNovoJogo(): void
   - exibirOpcoes(): void
   - lerOpcao(): int
   - processarOpcao(opcao: int): void
-  - exibirStatusCidade(): void
+  - iniciarNovoJogo(): void
+  - lerNome(pergunta: String): String
+  - exibirStatus(): void
+  - abrirMercado(): void
+  - lerQuantidade(): int
+  - comprarGraos(): void
+  - venderGraos(): void
+  - comprarTerras(): void
+  - venderTerras(): void
   - exibirSobre(): void
 }
 
@@ -25,19 +33,48 @@ class Jogador {
   + Jogador(nome: String)
   + getNome(): String
   + getTitulo(): String
+  + setTitulo(titulo: String): void
 }
 
 class Cidade {
   - nome: String
   - anoAtual: int
   - dono: Jogador
+  - florins: int
+  - terras: int
+  - graos: int
   + Cidade(nome: String, dono: Jogador)
+  + getNome(): String
+  + getAnoAtual(): int
+  + getDono(): Jogador
+  + getFlorins(): int
+  + getTerras(): int
+  + getGraos(): int
   + avancarAno(): void
+  + adicionarFlorins(qtd: int): void
+  + removerFlorins(qtd: int): boolean
+  + adicionarTerras(qtd: int): void
+  + removerTerras(qtd: int): boolean
+  + adicionarGraos(qtd: int): void
+  + removerGraos(qtd: int): boolean
   + exibirStatus(): void
+}
+
+class Mercado {
+  - PRECO_GRAO: int
+  - PRECO_TERRA: int
+  + getPrecoGrao(): int
+  + getPrecoTerra(): int
+  + comprarGraos(c: Cidade, qtd: int): boolean
+  + venderGraos(c: Cidade, qtd: int): boolean
+  + comprarTerras(c: Cidade, qtd: int): boolean
+  + venderTerras(c: Cidade, qtd: int): boolean
 }
 
 Main ..> Menu : cria e usa
 Menu --> "0..1" Jogador
 Menu --> "0..1" Cidade
+Menu --> "1" Mercado
 Cidade --> "1" Jogador : dono
+Mercado ..> Cidade : usa
 @enduml

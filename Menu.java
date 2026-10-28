@@ -3,13 +3,15 @@ package bolonhaemilano;
 import java.util.Scanner;
 
 /**
- * Menu principal do jogo: Novo jogo, Sobre o jogo e Sair.
+ * Menu principal do jogo: Novo jogo, Ver status da cidade, Sobre o jogo e Sair.
  * Cada metodo tem uma unica responsabilidade.
  */
 public class Menu {
 
     private Scanner scanner;
     private boolean emExecucao;
+    private Jogador jogador;
+    private Cidade cidade;
 
     public Menu() {
         this.scanner = new Scanner(System.in);
@@ -34,7 +36,8 @@ public class Menu {
         System.out.println(" Um jogo de estrategia economica medieval");
         System.out.println("==========================================");
         System.out.println("1 - Novo jogo");
-        System.out.println("2 - Sobre o jogo");
+        System.out.println("2 - Ver status da cidade");
+        System.out.println("3 - Sobre o jogo");
         System.out.println("0 - Sair");
         System.out.print("Escolha uma opcao: ");
     }
@@ -60,9 +63,12 @@ public class Menu {
         }
         switch (opcao) {
             case 1:
-                System.out.println("\nO novo jogo sera implementado na Etapa 2.");
+                iniciarNovoJogo();
                 break;
             case 2:
+                exibirStatusCidade();
+                break;
+            case 3:
                 exibirSobre();
                 break;
             case 0:
@@ -70,7 +76,45 @@ public class Menu {
                 emExecucao = false;
                 break;
             default:
-                System.out.println("\nOpcao invalida! Digite 1, 2 ou 0.");
+                System.out.println("\nOpcao invalida! Digite 1, 2, 3 ou 0.");
+        }
+    }
+
+    /** Pergunta os nomes, cria Jogador e Cidade e mostra o status inicial. */
+    private void iniciarNovoJogo() {
+        String nomeJogador = lerNome("Digite o nome do jogador: ");
+        String nomeCidade = lerNome("Digite o nome da cidade: ");
+        if (!emExecucao) {
+            return;
+        }
+        jogador = new Jogador(nomeJogador);
+        cidade = new Cidade(nomeCidade, jogador);
+        cidade.exibirStatus();
+    }
+
+    /** Le um nome nao vazio (repete a pergunta se vier em branco). */
+    private String lerNome(String pergunta) {
+        while (emExecucao) {
+            System.out.print(pergunta);
+            if (!scanner.hasNextLine()) {
+                emExecucao = false;
+                break;
+            }
+            String texto = scanner.nextLine().trim();
+            if (!texto.isEmpty()) {
+                return texto;
+            }
+            System.out.println("O nome nao pode ficar vazio.");
+        }
+        return "";
+    }
+
+    /** Mostra o status da cidade, ou avisa se nenhum jogo foi iniciado. */
+    private void exibirStatusCidade() {
+        if (cidade == null) {
+            System.out.println("\nNenhum jogo iniciado. Escolha 'Novo jogo' primeiro.");
+        } else {
+            cidade.exibirStatus();
         }
     }
 

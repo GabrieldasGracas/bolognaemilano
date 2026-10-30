@@ -13,11 +13,13 @@ public class Menu {
     private Jogador jogador;
     private Cidade cidade;
     private Mercado mercado;
+    private Agricultura agricultura;
 
     public Menu() {
         this.scanner = new Scanner(System.in);
         this.emExecucao = true;
         this.mercado = new Mercado();
+        this.agricultura = new Agricultura();
     }
 
     /** Laco principal: repete ate o jogador escolher sair. */
@@ -40,7 +42,8 @@ public class Menu {
         System.out.println("1 - Novo jogo");
         System.out.println("2 - Ver status da cidade");
         System.out.println("3 - Mercado");
-        System.out.println("4 - Sobre o jogo");
+        System.out.println("4 - Agricultura");
+        System.out.println("5 - Sobre o jogo");
         System.out.println("0 - Sair");
         System.out.print("Escolha uma opcao: ");
     }
@@ -75,6 +78,9 @@ public class Menu {
                 abrirMercado();
                 break;
             case 4:
+                abrirAgricultura();
+                break;
+            case 5:
                 exibirSobre();
                 break;
             case 0:
@@ -82,7 +88,7 @@ public class Menu {
                 emExecucao = false;
                 break;
             default:
-                System.out.println("\nOpcao invalida! Digite 1, 2, 3, 4 ou 0.");
+                System.out.println("\nOpcao invalida! Digite 1, 2, 3, 4, 5 ou 0.");
         }
     }
 
@@ -240,6 +246,77 @@ public class Menu {
             System.out.println("\nVenda realizada: -" + quantidade + " hectares.");
         } else {
             System.out.println("\nTerras insuficientes para essa venda.");
+        }
+    }
+
+    /** Submenu de Agricultura, em laco, ate o jogador voltar (opcao 0). */
+    private void abrirAgricultura() {
+        if (cidade == null) {
+            System.out.println("\nNenhum jogo iniciado. Escolha 'Novo jogo' primeiro.");
+            return;
+        }
+        boolean naAgricultura = true;
+        while (naAgricultura && emExecucao) {
+            System.out.println();
+            System.out.println("--- AGRICULTURA ---");
+            System.out.println("Terras: " + cidade.getTerras() + " hectares");
+            System.out.println("Servos: " + cidade.getServos());
+            System.out.println("Graos: " + cidade.getGraos());
+            System.out.println("1 - Colher (processar safra)");
+            System.out.println("2 - Distribuir alimentos");
+            System.out.println("0 - Voltar");
+            System.out.print("Escolha uma opcao: ");
+            int opcao = lerOpcao();
+            if (!emExecucao) {
+                break;
+            }
+            switch (opcao) {
+                case 1:
+                    colher();
+                    break;
+                case 2:
+                    distribuirAlimentos();
+                    break;
+                case 0:
+                    naAgricultura = false;
+                    break;
+                default:
+                    System.out.println("\nOpcao invalida! Digite 1, 2 ou 0.");
+            }
+        }
+    }
+
+    /** Delega a colheita para Agricultura e imprime o resultado. */
+    private void colher() {
+        int graosAntes = cidade.getGraos();
+        int hectares = agricultura.processarColheita(cidade);
+        System.out.println("\nColheita realizada: " + hectares + " hectares cultivados.");
+        System.out.println("Graos: " + graosAntes + " -> " + cidade.getGraos());
+    }
+
+    /** Le o percentual (20 a 80) e delega a distribuicao para Agricultura. */
+    private void distribuirAlimentos() {
+        int minimo = agricultura.getPercentualMinimo();
+        int maximo = agricultura.getPercentualMaximo();
+        System.out.print("Percentual do estoque de graos a distribuir (" + minimo + " a " + maximo + "): ");
+        if (!scanner.hasNextLine()) {
+            emExecucao = false;
+            return;
+        }
+        int percentual;
+        try {
+            percentual = Integer.parseInt(scanner.nextLine().trim());
+        } catch (NumberFormatException e) {
+            percentual = -1;
+        }
+        int servosAntes = cidade.getServos();
+        int graosAntes = cidade.getGraos();
+        if (agricultura.distribuirAlimentos(cidade, percentual)) {
+            System.out.println("\nAlimentos distribuidos.");
+            System.out.println("Graos: " + graosAntes + " -> " + cidade.getGraos());
+            System.out.println("Servos: " + servosAntes + " -> " + cidade.getServos());
+        } else {
+            System.out.println("\nPercentual invalido! Digite um numero de " + minimo + " a " + maximo + ".");
         }
     }
 

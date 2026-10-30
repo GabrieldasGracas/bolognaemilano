@@ -16,16 +16,15 @@ java -cp bin bolonhaemilano.Main
 
 | Pasta | Conteudo |
 |---|---|
-| `src/bolonhaemilano/` | Codigo-fonte Java (`Main`, `Menu`, ...) |
-| `casos-de-uso/` | Diagramas de casos de uso |
-| `uml/` | Diagramas de classes UML |
+| `src/bolonhaemilano/` | Codigo-fonte Java (`Main`, `Menu`, `Jogador`, `Cidade`, `Mercado`, `Agricultura`, ...) |
+| `uml/` | Diagramas de classes e de casos de uso (`.puml`, cumulativos) |
 
 ## Etapas
 
 1. Estrutura inicial, Main e menu (concluida)
-2. Classes Jogador e Cidade (concluida) 
+2. Classes Jogador e Cidade (concluida)
 3. Economia: florins, terras e graos (concluida)
-4. Agricultura e populacao
+4. Agricultura e populacao (concluida)
 5. Impostos e governo
 6. Construcoes e soldados
 7. Rodadas, multiplos jogadores e vitoria

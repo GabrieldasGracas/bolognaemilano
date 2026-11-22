@@ -15,6 +15,8 @@ public class Cidade {
     private int terras;
     private int graos;
     private int servos;
+    private int taxaImposto;
+    private String nivelJustica;
 
     public Cidade(String nome, Jogador dono) {
         this.nome = nome;
@@ -24,6 +26,8 @@ public class Cidade {
         this.terras = 10000;
         this.graos = 500;
         this.servos = 200;
+        this.taxaImposto = 10;
+    this.nivelJustica = "Moderada";
     }
 
     public String getNome() {
@@ -118,5 +122,101 @@ public class Cidade {
         System.out.println("Terras: " + terras + " hectares");
         System.out.println("Graos: " + graos + " unidades");
         System.out.println("Servos: " + servos);
+        System.out.println("Taxa de imposto: " + taxaImposto + "%");
+        System.out.println("Nível de justiça: " + nivelJustica);
     }
+
+    public int getTaxaImposto() {
+    return taxaImposto;
+    }
+
+    public void setTaxaImposto(int taxaImposto) {
+        this.taxaImposto = taxaImposto;
+    }
+
+    public String getNivelJustica() {
+        return nivelJustica;
+    }
+
+    public void setNivelJustica(String nivelJustica) {
+        this.nivelJustica = nivelJustica;
+    }
+
+
+public class Governo {
+
+    private static final int TAXA_MAXIMA = 50;
+
+    private static final double MULTIPLICADOR_JUSTA = 0.8;
+    private static final double MULTIPLICADOR_MODERADA = 1.0;
+    private static final double MULTIPLICADOR_SEVERA = 1.3;
+
+    public int arrecadarImpostos(Cidade cidade) {
+
+        int base = cidade.getServos()
+                * cidade.getTaxaImposto() / 100;
+
+        double multiplicador = multiplicadorPara(
+                cidade.getNivelJustica()
+        );
+
+        int arrecadado = (int) (base * multiplicador);
+
+        cidade.adicionarFlorins(arrecadado);
+
+        return arrecadado;
+    }
+
+    public boolean definirTaxaImposto(Cidade cidade, int taxa) {
+
+        if (taxa < 0 || taxa > TAXA_MAXIMA) {
+            return false;
+        }
+
+        cidade.setTaxaImposto(taxa);
+
+        return true;
+    }
+
+    public boolean definirJustica(Cidade cidade, String nivel) {
+
+        if (nivel == null) {
+            return false;
+        }
+
+        if (!nivel.equalsIgnoreCase("Justa")
+                && !nivel.equalsIgnoreCase("Moderada")
+                && !nivel.equalsIgnoreCase("Severa")) {
+            return false;
+        }
+
+        if (nivel.equalsIgnoreCase("Justa")) {
+            cidade.setNivelJustica("Justa");
+        } else if (nivel.equalsIgnoreCase("Moderada")) {
+            cidade.setNivelJustica("Moderada");
+        } else {
+            cidade.setNivelJustica("Severa");
+        }
+
+        return true;
+    }
+
+    private double multiplicadorPara(String nivel) {
+
+        if (nivel.equals("Justa")) {
+            return MULTIPLICADOR_JUSTA;
+        }
+
+        if (nivel.equals("Moderada")) {
+            return MULTIPLICADOR_MODERADA;
+        }
+
+        if (nivel.equals("Severa")) {
+            return MULTIPLICADOR_SEVERA;
+        }
+
+        return MULTIPLICADOR_MODERADA;
+    }
+}
+
 }

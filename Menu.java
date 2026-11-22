@@ -1,10 +1,11 @@
+
 package bolonhaemilano;
 
 import java.util.Scanner;
 
 /**
- * Menu principal do jogo e submenu do Mercado.
- * Cada metodo tem uma unica responsabilidade.
+ * Menu principal do jogo e submenus de Mercado,
+ * Agricultura e Governo.
  */
 public class Menu {
 
@@ -14,15 +15,17 @@ public class Menu {
     private Cidade cidade;
     private Mercado mercado;
     private Agricultura agricultura;
+    private Governo governo;
 
     public Menu() {
         this.scanner = new Scanner(System.in);
         this.emExecucao = true;
         this.mercado = new Mercado();
         this.agricultura = new Agricultura();
+        this.governo = new Governo();
     }
 
-    /** Laco principal: repete ate o jogador escolher sair. */
+    /** Laco principal do jogo. */
     public void executar() {
         while (emExecucao) {
             exibirOpcoes();
@@ -32,7 +35,7 @@ public class Menu {
         scanner.close();
     }
 
-    /** Apenas imprime o menu; nao le nada do teclado. */
+    /** Exibe o menu principal. */
     private void exibirOpcoes() {
         System.out.println();
         System.out.println("==========================================");
@@ -43,18 +46,21 @@ public class Menu {
         System.out.println("2 - Ver status da cidade");
         System.out.println("3 - Mercado");
         System.out.println("4 - Agricultura");
-        System.out.println("5 - Sobre o jogo");
+        System.out.println("5 - Governo");
+        System.out.println("6 - Sobre o jogo");
         System.out.println("0 - Sair");
         System.out.print("Escolha uma opcao: ");
     }
 
-    /** Le uma linha e converte para inteiro; devolve -1 se for invalida. */
+    /** Le uma opcao do teclado. */
     private int lerOpcao() {
-        if (!scanner.hasNextLine()) {   // fim da entrada (Ctrl+D / Ctrl+Z): encerra
+        if (!scanner.hasNextLine()) {
             emExecucao = false;
             return -1;
         }
+
         String linha = scanner.nextLine().trim();
+
         try {
             return Integer.parseInt(linha);
         } catch (NumberFormatException e) {
@@ -62,66 +68,84 @@ public class Menu {
         }
     }
 
-    /** Decide a acao de acordo com a opcao lida. */
+    /** Processa a opcao escolhida. */
     private void processarOpcao(int opcao) {
         if (!emExecucao) {
             return;
         }
+
         switch (opcao) {
             case 1:
                 iniciarNovoJogo();
                 break;
+
             case 2:
                 exibirStatus();
                 break;
+
             case 3:
                 abrirMercado();
                 break;
+
             case 4:
                 abrirAgricultura();
                 break;
+
             case 5:
+                abrirGoverno();
+                break;
+
+            case 6:
                 exibirSobre();
                 break;
+
             case 0:
                 System.out.println("\nAte logo!");
                 emExecucao = false;
                 break;
+
             default:
-                System.out.println("\nOpcao invalida! Digite 1, 2, 3, 4, 5 ou 0.");
+                System.out.println("\nOpcao invalida! Digite 1, 2, 3, 4, 5, 6 ou 0.");
         }
     }
 
-    /** Pergunta os nomes, cria Jogador e Cidade e mostra o status inicial. */
+    /** Inicia um novo jogo. */
     private void iniciarNovoJogo() {
         String nomeJogador = lerNome("Digite o nome do jogador: ");
         String nomeCidade = lerNome("Digite o nome da cidade: ");
+
         if (!emExecucao) {
             return;
         }
+
         jogador = new Jogador(nomeJogador);
         cidade = new Cidade(nomeCidade, jogador);
         cidade.exibirStatus();
     }
 
-    /** Le um nome nao vazio (repete a pergunta se vier em branco). */
+    /** Le um nome nao vazio. */
     private String lerNome(String pergunta) {
         while (emExecucao) {
             System.out.print(pergunta);
+
             if (!scanner.hasNextLine()) {
                 emExecucao = false;
                 break;
             }
+
             String texto = scanner.nextLine().trim();
+
             if (!texto.isEmpty()) {
                 return texto;
             }
+
             System.out.println("O nome nao pode ficar vazio.");
         }
+
         return "";
     }
 
-    /** Mostra o status da cidade, ou avisa se nenhum jogo foi iniciado. */
+    /** Exibe o status da cidade. */
     private void exibirStatus() {
         if (cidade == null) {
             System.out.println("\nNenhum jogo iniciado. Escolha 'Novo jogo' primeiro.");
@@ -130,13 +154,15 @@ public class Menu {
         }
     }
 
-    /** Submenu do Mercado, em laco, ate o jogador voltar (opcao 0). */
+    /** Submenu do Mercado. */
     private void abrirMercado() {
         if (cidade == null) {
             System.out.println("\nNenhum jogo iniciado. Escolha 'Novo jogo' primeiro.");
             return;
         }
+
         boolean noMercado = true;
+
         while (noMercado && emExecucao) {
             System.out.println();
             System.out.println("--- MERCADO ---");
@@ -151,10 +177,13 @@ public class Menu {
             System.out.println("4 - Vender terras");
             System.out.println("0 - Voltar");
             System.out.print("Escolha uma opcao: ");
+
             int opcao = lerOpcao();
+
             if (!emExecucao) {
                 break;
             }
+
             switch (opcao) {
                 case 1:
                     comprarGraos();
@@ -177,14 +206,17 @@ public class Menu {
         }
     }
 
-    /** Le e valida a quantidade digitada; devolve -1 se invalida. */
+    /** Le e valida uma quantidade positiva. */
     private int lerQuantidade() {
         System.out.print("Quantidade: ");
+
         if (!scanner.hasNextLine()) {
             emExecucao = false;
             return -1;
         }
+
         String linha = scanner.nextLine().trim();
+
         try {
             int quantidade = Integer.parseInt(linha);
             return quantidade > 0 ? quantidade : -1;
@@ -195,9 +227,11 @@ public class Menu {
 
     private void comprarGraos() {
         int quantidade = lerQuantidade();
+
         if (!emExecucao) {
             return;
         }
+
         if (quantidade <= 0) {
             System.out.println("\nQuantidade invalida! Digite um numero inteiro positivo.");
         } else if (mercado.comprarGraos(cidade, quantidade)) {
@@ -209,9 +243,11 @@ public class Menu {
 
     private void venderGraos() {
         int quantidade = lerQuantidade();
+
         if (!emExecucao) {
             return;
         }
+
         if (quantidade <= 0) {
             System.out.println("\nQuantidade invalida! Digite um numero inteiro positivo.");
         } else if (mercado.venderGraos(cidade, quantidade)) {
@@ -223,9 +259,11 @@ public class Menu {
 
     private void comprarTerras() {
         int quantidade = lerQuantidade();
+
         if (!emExecucao) {
             return;
         }
+
         if (quantidade <= 0) {
             System.out.println("\nQuantidade invalida! Digite um numero inteiro positivo.");
         } else if (mercado.comprarTerras(cidade, quantidade)) {
@@ -237,9 +275,11 @@ public class Menu {
 
     private void venderTerras() {
         int quantidade = lerQuantidade();
+
         if (!emExecucao) {
             return;
         }
+
         if (quantidade <= 0) {
             System.out.println("\nQuantidade invalida! Digite um numero inteiro positivo.");
         } else if (mercado.venderTerras(cidade, quantidade)) {
@@ -249,13 +289,15 @@ public class Menu {
         }
     }
 
-    /** Submenu de Agricultura, em laco, ate o jogador voltar (opcao 0). */
+    /** Submenu de Agricultura. */
     private void abrirAgricultura() {
         if (cidade == null) {
             System.out.println("\nNenhum jogo iniciado. Escolha 'Novo jogo' primeiro.");
             return;
         }
+
         boolean naAgricultura = true;
+
         while (naAgricultura && emExecucao) {
             System.out.println();
             System.out.println("--- AGRICULTURA ---");
@@ -266,10 +308,13 @@ public class Menu {
             System.out.println("2 - Distribuir alimentos");
             System.out.println("0 - Voltar");
             System.out.print("Escolha uma opcao: ");
+
             int opcao = lerOpcao();
+
             if (!emExecucao) {
                 break;
             }
+
             switch (opcao) {
                 case 1:
                     colher();
@@ -286,41 +331,170 @@ public class Menu {
         }
     }
 
-    /** Delega a colheita para Agricultura e imprime o resultado. */
+    /** Delega a colheita para Agricultura. */
     private void colher() {
         int graosAntes = cidade.getGraos();
         int hectares = agricultura.processarColheita(cidade);
+
         System.out.println("\nColheita realizada: " + hectares + " hectares cultivados.");
         System.out.println("Graos: " + graosAntes + " -> " + cidade.getGraos());
     }
 
-    /** Le o percentual (20 a 80) e delega a distribuicao para Agricultura. */
+    /** Delega a distribuicao de alimentos para Agricultura. */
     private void distribuirAlimentos() {
         int minimo = agricultura.getPercentualMinimo();
         int maximo = agricultura.getPercentualMaximo();
-        System.out.print("Percentual do estoque de graos a distribuir (" + minimo + " a " + maximo + "): ");
+
+        System.out.print("Percentual do estoque de graos a distribuir ("
+                + minimo + " a " + maximo + "): ");
+
         if (!scanner.hasNextLine()) {
             emExecucao = false;
             return;
         }
+
         int percentual;
+
         try {
             percentual = Integer.parseInt(scanner.nextLine().trim());
         } catch (NumberFormatException e) {
             percentual = -1;
         }
+
         int servosAntes = cidade.getServos();
         int graosAntes = cidade.getGraos();
+
         if (agricultura.distribuirAlimentos(cidade, percentual)) {
             System.out.println("\nAlimentos distribuidos.");
             System.out.println("Graos: " + graosAntes + " -> " + cidade.getGraos());
             System.out.println("Servos: " + servosAntes + " -> " + cidade.getServos());
         } else {
-            System.out.println("\nPercentual invalido! Digite um numero de " + minimo + " a " + maximo + ".");
+            System.out.println("\nPercentual invalido! Digite um numero de "
+                    + minimo + " a " + maximo + ".");
         }
     }
 
-    /** Explica o jogo ao jogador. */
+    /** Submenu de Governo. */
+    private void abrirGoverno() {
+        if (cidade == null) {
+            System.out.println("\nNenhum jogo iniciado. Escolha 'Novo jogo' primeiro.");
+            return;
+        }
+
+        boolean noGoverno = true;
+
+        while (noGoverno && emExecucao) {
+            System.out.println();
+            System.out.println("--- GOVERNO ---");
+            System.out.println("Florins disponiveis: " + cidade.getFlorins());
+            System.out.println("Servos: " + cidade.getServos());
+            System.out.println("Taxa de imposto: " + cidade.getTaxaImposto() + "%");
+            System.out.println("Nivel de justica: " + cidade.getNivelJustica());
+            System.out.println("1 - Arrecadar impostos");
+            System.out.println("2 - Definir taxa de imposto");
+            System.out.println("3 - Definir nivel de justica");
+            System.out.println("0 - Voltar");
+            System.out.print("Escolha uma opcao: ");
+
+            int opcao = lerOpcao();
+
+            if (!emExecucao) {
+                break;
+            }
+
+            switch (opcao) {
+                case 1:
+                    arrecadarImpostos();
+                    break;
+                case 2:
+                    definirTaxaImposto();
+                    break;
+                case 3:
+                    definirJustica();
+                    break;
+                case 0:
+                    noGoverno = false;
+                    break;
+                default:
+                    System.out.println("\nOpcao invalida! Digite 1, 2, 3 ou 0.");
+            }
+        }
+    }
+
+    /** Delega a arrecadacao para Governo. */
+    private void arrecadarImpostos() {
+        int arrecadado = governo.arrecadarImpostos(cidade);
+
+        System.out.println("\nImpostos arrecadados com sucesso!");
+        System.out.println("Valor arrecadado: " + arrecadado + " florins.");
+        System.out.println("Florins disponiveis: " + cidade.getFlorins());
+    }
+
+    /** Define uma nova taxa de imposto. */
+    private void definirTaxaImposto() {
+        System.out.print("Digite a nova taxa de imposto (0 a 50): ");
+
+        if (!scanner.hasNextLine()) {
+            emExecucao = false;
+            return;
+        }
+
+        int taxa;
+
+        try {
+            taxa = Integer.parseInt(scanner.nextLine().trim());
+        } catch (NumberFormatException e) {
+            taxa = -1;
+        }
+
+        if (governo.definirTaxaImposto(cidade, taxa)) {
+            System.out.println("\nTaxa de imposto atualizada para "
+                    + cidade.getTaxaImposto() + "%.");
+        } else {
+            System.out.println("\nTaxa invalida! Digite um numero entre 0 e 50.");
+        }
+    }
+
+    /** Define o nivel de justica do governo. */
+    private void definirJustica() {
+        System.out.println("\n--- NIVEL DE JUSTICA ---");
+        System.out.println("1 - Justa");
+        System.out.println("2 - Moderada");
+        System.out.println("3 - Severa");
+        System.out.print("Escolha uma opcao: ");
+
+        int opcao = lerOpcao();
+
+        if (!emExecucao) {
+            return;
+        }
+
+        String nivel;
+
+        switch (opcao) {
+            case 1:
+                nivel = "Justa";
+                break;
+            case 2:
+                nivel = "Moderada";
+                break;
+            case 3:
+                nivel = "Severa";
+                break;
+            default:
+                System.out.println("\nOpcao invalida!");
+                return;
+        }
+
+        if (governo.definirJustica(cidade, nivel)) {
+            System.out.println("\nNivel de justica atualizado para "
+                    + cidade.getNivelJustica() + ".");
+        } else {
+            System.out.println("\nNao foi possivel alterar o nivel de justica.");
+        }
+    }
+
+    /** Exibe informacoes sobre o jogo. */
     private void exibirSobre() {
         System.out.println();
         System.out.println("--- SOBRE O JOGO ---");

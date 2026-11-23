@@ -1,4 +1,3 @@
-
 package bolonhaemilano;
 
 public class Governo {
@@ -11,6 +10,10 @@ public class Governo {
 
     public int arrecadarImpostos(Cidade cidade) {
 
+        if (cidade.isImpostosArrecadados()) {
+            return -1;
+        }
+
         int base = cidade.getServos()
                 * cidade.getTaxaImposto() / 100;
 
@@ -21,6 +24,7 @@ public class Governo {
         int arrecadado = (int) (base * multiplicador);
 
         cidade.adicionarFlorins(arrecadado);
+        cidade.marcarImpostosArrecadados();
 
         return arrecadado;
     }
@@ -32,7 +36,6 @@ public class Governo {
         }
 
         cidade.setTaxaImposto(taxa);
-
         return true;
     }
 

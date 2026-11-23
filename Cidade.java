@@ -1,15 +1,11 @@
-
 package bolonhaemilano;
 
-/**
- * Representa a cidade governada por um Jogador.
- * Armazena os recursos, o ano atual e as configuracoes do governo.
- */
 public class Cidade {
 
     private String nome;
     private int anoAtual;
     private Jogador dono;
+
     private int florins;
     private int terras;
     private int graos;
@@ -19,18 +15,27 @@ public class Cidade {
     private int soldados;
     private int construcoes;
 
+    private boolean colheitaFeita;
+    private boolean impostosArrecadados;
+
     public Cidade(String nome, Jogador dono) {
         this.nome = nome;
         this.dono = dono;
         this.anoAtual = 1400;
+
         this.florins = 1000;
         this.terras = 10000;
         this.graos = 500;
         this.servos = 200;
+
         this.taxaImposto = 10;
         this.nivelJustica = "Moderada";
+
         this.soldados = 0;
         this.construcoes = 0;
+
+        this.colheitaFeita = false;
+        this.impostosArrecadados = false;
     }
 
     public String getNome() {
@@ -73,20 +78,38 @@ public class Cidade {
         return taxaImposto;
     }
 
-    public String getNivelJustica() {
-        return nivelJustica;
-    }
-
     public void setTaxaImposto(int taxaImposto) {
         this.taxaImposto = taxaImposto;
+    }
+
+    public String getNivelJustica() {
+        return nivelJustica;
     }
 
     public void setNivelJustica(String nivelJustica) {
         this.nivelJustica = nivelJustica;
     }
 
+    public boolean isColheitaFeita() {
+        return colheitaFeita;
+    }
+
+    public void marcarColheitaFeita() {
+        colheitaFeita = true;
+    }
+
+    public boolean isImpostosArrecadados() {
+        return impostosArrecadados;
+    }
+
+    public void marcarImpostosArrecadados() {
+        impostosArrecadados = true;
+    }
+
     public void avancarAno() {
         anoAtual++;
+        colheitaFeita = false;
+        impostosArrecadados = false;
     }
 
     public void adicionarFlorins(int quantidade) {
@@ -183,15 +206,20 @@ public class Cidade {
         System.out.println();
         System.out.println("--- STATUS DA CIDADE ---");
         System.out.println("Cidade: " + nome);
-        System.out.println("Governante: " + dono.getTitulo() + " " + dono.getNome());
+        System.out.println("Governante: " + dono.getTitulo()
+                + " " + dono.getNome());
         System.out.println("Ano atual: " + anoAtual);
         System.out.println("Florins: " + florins);
         System.out.println("Terras: " + terras + " hectares");
         System.out.println("Graos: " + graos + " unidades");
         System.out.println("Servos: " + servos);
-        System.out.println("Taxa de imposto: " + taxaImposto + "%");
-        System.out.println("Nivel de justica: " + nivelJustica);
         System.out.println("Soldados: " + soldados);
         System.out.println("Construcoes: " + construcoes);
+        System.out.println("Taxa de imposto: " + taxaImposto + "%");
+        System.out.println("Nivel de justica: " + nivelJustica);
+        System.out.println("Colheita realizada neste ano: "
+                + (colheitaFeita ? "Sim" : "Nao"));
+        System.out.println("Impostos arrecadados neste ano: "
+                + (impostosArrecadados ? "Sim" : "Nao"));
     }
 }

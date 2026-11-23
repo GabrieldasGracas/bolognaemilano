@@ -1,8 +1,9 @@
 
 @startuml
-title Bolonha e Milano - Diagrama de Classes
+title Bolonha e Milano - Diagrama de Classes (Etapa 6)
 
 skinparam classAttributeIconSize 0
+skinparam linetype ortho
 
 class Main {
     +main(args: String[]): void
@@ -16,34 +17,32 @@ class Menu {
     -mercado: Mercado
     -agricultura: Agricultura
     -governo: Governo
+    -construcoes: Construcoes
 
     +Menu()
     +executar(): void
-
     -exibirOpcoes(): void
     -lerOpcao(): int
     -processarOpcao(opcao: int): void
     -iniciarNovoJogo(): void
+    -lerNome(pergunta: String): String
     -exibirStatus(): void
     -abrirMercado(): void
-    -abrirAgricultura(): void
-    -abrirGoverno(): void
-
-    -lerNome(pergunta: String): String
     -lerQuantidade(): int
-
     -comprarGraos(): void
     -venderGraos(): void
     -comprarTerras(): void
     -venderTerras(): void
-
+    -abrirAgricultura(): void
     -colher(): void
     -distribuirAlimentos(): void
-
+    -abrirGoverno(): void
     -arrecadarImpostos(): void
     -definirTaxaImposto(): void
     -definirJustica(): void
-
+    -abrirConstrucoes(): void
+    -recrutarSoldados(): void
+    -construir(): void
     -exibirSobre(): void
 }
 
@@ -51,7 +50,6 @@ class Jogador {
     -nome: String
     -titulo: String
 
-    +Jogador(nome: String)
     +getNome(): String
     +getTitulo(): String
     +setTitulo(titulo: String): void
@@ -67,38 +65,36 @@ class Cidade {
     -servos: int
     -taxaImposto: int
     -nivelJustica: String
+    -soldados: int
+    -construcoes: int
 
     +Cidade(nome: String, dono: Jogador)
-
     +getNome(): String
     +getAnoAtual(): int
     +getDono(): Jogador
-
     +getFlorins(): int
     +getTerras(): int
     +getGraos(): int
     +getServos(): int
-
+    +getSoldados(): int
+    +getConstrucoes(): int
     +getTaxaImposto(): int
-    +setTaxaImposto(taxa: int): void
-
     +getNivelJustica(): String
+    +setTaxaImposto(taxa: int): void
     +setNivelJustica(nivel: String): void
-
     +avancarAno(): void
-
     +adicionarFlorins(qtd: int): void
     +removerFlorins(qtd: int): boolean
-
     +adicionarTerras(qtd: int): void
     +removerTerras(qtd: int): boolean
-
     +adicionarGraos(qtd: int): void
     +removerGraos(qtd: int): boolean
-
     +adicionarServos(qtd: int): void
     +removerServos(qtd: int): boolean
-
+    +adicionarSoldados(qtd: int): void
+    +removerSoldados(qtd: int): boolean
+    +adicionarConstrucoes(qtd: int): void
+    +removerConstrucoes(qtd: int): boolean
     +exibirStatus(): void
 }
 
@@ -108,12 +104,10 @@ class Mercado {
 
     +getPrecoGrao(): int
     +getPrecoTerra(): int
-
-    +comprarGraos(c: Cidade, qtd: int): boolean
-    +venderGraos(c: Cidade, qtd: int): boolean
-
-    +comprarTerras(c: Cidade, qtd: int): boolean
-    +venderTerras(c: Cidade, qtd: int): boolean
+    +comprarGraos(cidade: Cidade, qtd: int): boolean
+    +venderGraos(cidade: Cidade, qtd: int): boolean
+    +comprarTerras(cidade: Cidade, qtd: int): boolean
+    +venderTerras(cidade: Cidade, qtd: int): boolean
 }
 
 class Agricultura {
@@ -124,11 +118,10 @@ class Agricultura {
     -PERCENTUAL_MINIMO: int
     -PERCENTUAL_MAXIMO: int
 
-    +getPercentualMinimo(): int
-    +getPercentualMaximo(): int
-
     +processarColheita(cidade: Cidade): int
     +distribuirAlimentos(cidade: Cidade, percentual: int): boolean
+    +getPercentualMinimo(): int
+    +getPercentualMaximo(): int
 }
 
 class Governo {
@@ -140,21 +133,46 @@ class Governo {
     +arrecadarImpostos(cidade: Cidade): int
     +definirTaxaImposto(cidade: Cidade, taxa: int): boolean
     +definirJustica(cidade: Cidade, nivel: String): boolean
-
     -multiplicadorPara(nivel: String): double
 }
 
+class Construcoes {
+    -PRECO_SOLDADO: int
+    -SERVOS_POR_SOLDADO: int
+    -PRECO_CONSTRUCAO: int
+
+    +recrutarSoldados(cidade: Cidade, quantidade: int): boolean
+    +construir(cidade: Cidade, quantidade: int): boolean
+    +getPrecoSoldado(): int
+    +getPrecoConstrucao(): int
+}
+
 Main ..> Menu : cria
-Menu --> Jogador
-Menu --> Cidade
-Menu --> Mercado
-Menu --> Agricultura
-Menu --> Governo
+Menu --> Jogador : utiliza
+Menu --> Cidade : utiliza
+Menu --> Mercado : utiliza
+Menu --> Agricultura : utiliza
+Menu --> Governo : utiliza
+Menu --> Construcoes : utiliza
 
 Cidade --> Jogador : dono
 
 Mercado ..> Cidade : utiliza
 Agricultura ..> Cidade : utiliza
 Governo ..> Cidade : utiliza
+Construcoes ..> Cidade : utiliza
+
+note right of Construcoes
+  Nova classe da Etapa 6.
+  Recrutamento consome florins
+  e servos.
+  Construção consome florins.
+end note
+
+note bottom of Cidade
+  Soldados e construções começam em 0.
+  Os métodos remover* retornam boolean
+  e impedem recursos negativos.
+end note
 
 @enduml

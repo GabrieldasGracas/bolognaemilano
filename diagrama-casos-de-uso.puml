@@ -1,8 +1,11 @@
 
 @startuml
-title Bolonha e Milano - Diagrama de Casos de Uso
+title Bolonha e Milano - Diagrama de Casos de Uso (Etapa 6)
 
 left to right direction
+
+skinparam packageStyle rectangle
+skinparam shadowing false
 
 actor Jogador
 
@@ -10,44 +13,51 @@ rectangle "Bolonha e Milano" {
 
     usecase "Iniciar novo jogo" as UC1
     usecase "Ver status da cidade" as UC2
-
     usecase "Acessar mercado" as UC3
-    usecase "Comprar graos" as UC4
-    usecase "Vender graos" as UC5
-    usecase "Comprar terras" as UC6
-    usecase "Vender terras" as UC7
+    usecase "Acessar agricultura" as UC4
+    usecase "Acessar governo" as UC5
+    usecase "Acessar construções" as UC6
+    usecase "Ver informações\nsobre o jogo" as UC7
+    usecase "Sair do jogo" as UC8
 
-    usecase "Acessar agricultura" as UC8
-    usecase "Colher (processar safra)" as UC9
-    usecase "Distribuir alimentos" as UC10
+    usecase "Comprar grãos" as UC9
+    usecase "Vender grãos" as UC10
+    usecase "Comprar terras" as UC11
+    usecase "Vender terras" as UC12
 
-    usecase "Acessar governo" as UC11
-    usecase "Arrecadar impostos" as UC12
-    usecase "Definir taxa de imposto" as UC13
-    usecase "Definir nivel de justica" as UC14
+    usecase "Colher\n(processar safra)" as UC13
+    usecase "Distribuir alimentos" as UC14
 
-    usecase "Ver informacoes sobre o jogo" as UC15
-    usecase "Sair do jogo" as UC16
+    usecase "Arrecadar impostos" as UC15
+    usecase "Definir taxa\nde imposto" as UC16
+    usecase "Definir nível\nde justiça" as UC17
+
+    usecase "Recrutar soldados" as UC18
+    usecase "Construir" as UC19
 }
 
 Jogador --> UC1
 Jogador --> UC2
 Jogador --> UC3
+Jogador --> UC4
+Jogador --> UC5
+Jogador --> UC6
+Jogador --> UC7
 Jogador --> UC8
-Jogador --> UC11
-Jogador --> UC15
-Jogador --> UC16
 
-UC4 ..> UC3 : <<extend>>
-UC5 ..> UC3 : <<extend>>
-UC6 ..> UC3 : <<extend>>
-UC7 ..> UC3 : <<extend>>
+UC9 ..> UC3 : <<extend>>
+UC10 ..> UC3 : <<extend>>
+UC11 ..> UC3 : <<extend>>
+UC12 ..> UC3 : <<extend>>
 
-UC9 ..> UC8 : <<extend>>
-UC10 ..> UC8 : <<extend>>
+UC13 ..> UC4 : <<extend>>
+UC14 ..> UC4 : <<extend>>
 
-UC12 ..> UC11 : <<extend>>
-UC13 ..> UC11 : <<extend>>
-UC14 ..> UC11 : <<extend>>
+UC15 ..> UC5 : <<extend>>
+UC16 ..> UC5 : <<extend>>
+UC17 ..> UC5 : <<extend>>
+
+UC18 ..> UC6 : <<extend>>
+UC19 ..> UC6 : <<extend>>
 
 @enduml

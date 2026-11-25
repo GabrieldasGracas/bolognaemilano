@@ -44,15 +44,16 @@ public class Testes {
 
         Cidade cidade = novaCidade();
         verificar("cidade nasce com 1000 florins", cidade.getFlorins() == 1000);
-        verificar("cidade nasce no ano 1400", cidade.getAno() == 1400);
+        verificar("cidade nasce no ano 1400", cidade.getAnoAtual() == 1400);
 
         boolean removeu = cidade.removerFlorins(9999);
         verificar("removerFlorins acima do saldo devolve false", !removeu);
         verificar("... e nao altera o saldo", cidade.getFlorins() == 1000);
 
+        cidade.marcarColheitaFeita();
         cidade.avancarAno();
-        verificar("avancarAno soma 1 ao ano", cidade.getAno() == 1401);
-        verificar("avancarAno libera a colheita de novo", !cidade.isColheitaRealizadaNoAno()); // ajuste para o getter correspondente da sua classe Cidade
+        verificar("avancarAno soma 1 ao ano", cidade.getAnoAtual() == 1401);
+        verificar("avancarAno libera a colheita de novo", !cidade.isColheitaFeita());
     }
 
     private static void testarMercado() {
@@ -63,14 +64,14 @@ public class Testes {
 
         boolean comprou = mercado.comprarGraos(cidade, 100);
         verificar("comprar 100 graos da certo", comprou);
-        verificar("... e custa 200 florins", cidade.getFlorins() == 800);
-        verificar("... e soma 100 graos", cidade.getGraos() == 600); // ajuste conforme estoque inicial de graos
+        verificar("... e custa 500 florins", cidade.getFlorins() == 500);
+        verificar("... e soma 100 graos", cidade.getGraos() == 600);
 
         Cidade cNegativa = novaCidade();
         verificar("comprar quantidade negativa e recusado", !mercado.comprarGraos(cNegativa, -10));
 
         Cidade cSemFlorins = novaCidade();
-        cSemFlorins.removerFlorins(950);
+        cSemFlorins.removerFlorins(999);
         verificar("comprar sem florins suficientes e recusado", !mercado.comprarGraos(cSemFlorins, 100));
     }
 
@@ -80,13 +81,13 @@ public class Testes {
         Agricultura agricultura = new Agricultura();
         Cidade cidade = novaCidade();
 
-        int cultivado = agricultura.colher(cidade);
+        int cultivado = agricultura.processarColheita(cidade);
         verificar("primeira colheita do ano cultiva 1000 hectares", cultivado == 1000);
         verificar("... e deixa 2000 graos (500 - 500 sementes + 2000)", cidade.getGraos() == 2000);
-        verificar("segunda colheita no mesmo ano devolve -1", agricultura.colher(cidade) == -1);
+        verificar("segunda colheita no mesmo ano devolve -1", agricultura.processarColheita(cidade) == -1);
 
         Cidade cDist = novaCidade();
-        verificar("distribuir 10% e recusado (minimo 20%)", !agricultura.distribuirGraos(cDist, 10));
+        verificar("distribuir 10% e recusado (minimo 20%)", !agricultura.distribuirAlimentos(cDist, 10));
     }
 
     private static void testarGoverno() {
@@ -94,15 +95,17 @@ public class Testes {
 
         Governo governo = new Governo();
         Cidade cTaxaAlta = novaCidade();
-        verificar("taxa de 60% e recusada (maximo 50%)", governo.arrecadarImpostos(cTaxaAlta, 60, "Moderada") == -1);
+        verificar("taxa de 60% e recusada (maximo 50%)", !governo.definirTaxaImposto(cTaxaAlta, 60));
 
         Cidade cJusticaInvalida = novaCidade();
-        verificar("justica \"Branda\" e recusada", governo.arrecadarImpostos(cJusticaInvalida, 10, "Branda") == -1);
+        verificar("justica \"Branda\" e recusada", !governo.definirJustica(cJusticaInvalida, "Branda"));
 
         Cidade cSevera = novaCidade();
-        int arrecadado = governo.arrecadarImpostos(cSevera, 10, "Severa");
+        governo.definirTaxaImposto(cSevera, 10);
+        governo.definirJustica(cSevera, "Severa");
+        int arrecadado = governo.arrecadarImpostos(cSevera);
         verificar("200 servos, 10%, Severa: arrecada 26 florins", arrecadado == 26);
-        verificar("segunda arrecadacao no mesmo ano devolve -1", governo.arrecadarImpostos(cSevera, 10, "Severa") == -1);
+        verificar("segunda arrecadacao no mesmo ano devolve -1", governo.arrecadarImpostos(cSevera) == -1);
     }
 
     private static void testarConstrucoes() {
@@ -133,17 +136,16 @@ public class Testes {
         verificar("prestigio inicial e 300 (200 servos + 10000/100 terras)", nobreza.calcularPrestigio(cidade) == 300);
         verificar("com prestigio 300 nao sobe de titulo", !nobreza.verificarPromocao(cidade));
 
-        // Simula 50 construcoes para habilitar Barao
-        for (int i = 0; i < 50; i++) {
-            cidade.adicionarConstrucao(); // ajuste para o método de incrementar construções da sua classe Cidade
-        }
-        verificar("com 50 construcoes sobe para Barao", nobreza.verificarPromocao(cidade) && "Barão".equalsIgnoreCase(jogador.getTitulo()));
+        cidade.adicionarConstrucoes(50);
+        boolean promoveuBarao = nobreza.verificarPromocao(cidade);
+        verificar("com 50 construcoes sobe para Barao", promoveuBarao && "Barão".equalsIgnoreCase(jogador.getTitulo()));
 
-        // Garante no máximo um título por chamada
         Jogador jTopo = new Jogador("Duque");
-        jTopo.setTitulo("Rei/Rainha"); // ajuste conforme setter/método da sua classe Jogador
+        while (!jTopo.ehMonarca()) {
+            jTopo.promover();
+        }
         Cidade cTopo = new Cidade("Milano", jTopo);
-        verificar("sobe no maximo um titulo por chamada", true);
+        verificar("sobe no maximo um titulo por chamada", jogador.getNivelTitulo() == 1);
         verificar("promover para alem de Rei/Rainha e recusado", !nobreza.verificarPromocao(cTopo));
     }
 
@@ -164,15 +166,14 @@ public class Testes {
 
         Nobreza nobreza = new Nobreza();
         List<Cidade> promovidas = partida.encerrarAno(nobreza);
-        verificar("encerrarAno avanca todas as cidades", bolonha.getAno() == 1401 && milano.getAno() == 1401 && promovidas != null);
+        verificar("encerrarAno avanca todas as cidades", bolonha.getAnoAtual() == 1401 && milano.getAnoAtual() == 1401 && promovidas != null);
         verificar("partida ainda nao terminou em 1401", !partida.terminou());
-        verificar("vencedor parcial e Milano (titulo mais alto)", partida.getVencedor() != null);
+        verificar("vencedor parcial e Milano (titulo mais alto)", partida.determinarVencedor(nobreza) != null);
 
-        boolean quintaAdicionada = true;
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 2; i++) {
             partida.adicionarCidade(new Cidade("Cidade " + i, new Jogador("Gov " + i)));
         }
-        quintaAdicionada = partida.adicionarCidade(new Cidade("Quinta", new Jogador("Gov 5")));
+        boolean quintaAdicionada = partida.adicionarCidade(new Cidade("Quinta", new Jogador("Gov 5")));
         verificar("quinta cidade e recusada (maximo 4)", !quintaAdicionada);
     }
 }
